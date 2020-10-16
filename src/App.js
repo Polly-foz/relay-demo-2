@@ -4,16 +4,16 @@ import {renderRoutes} from "react-router-config";
 import {QueryRenderer} from 'react-relay';
 import graphql from 'babel-plugin-relay/macro';
 import RelayEnvironment from './RelayEnvironment';
+import Profile from "./components/Profile";
 
 const AppNameQuery = graphql`
     query AppIdQuery {
         viewer {
             id
+            ...Profile_viewer
         }
     }
 `
-
-
 
 function App(props) {
     const renderQuery = ({error, props: rQProps}) => {
@@ -26,7 +26,7 @@ function App(props) {
         } else if (rQProps) {
             return (
                 <div className="App">
-                    <h1>App</h1>
+                    <Profile viewer={rQProps.viewer}/>
                     {renderRoutes(props.route.routes)}
                 </div>
             )
@@ -42,6 +42,5 @@ function App(props) {
         />
     );
 }
-
 
 export default App;
