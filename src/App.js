@@ -11,6 +11,7 @@ const AppNameQuery = graphql`
         viewer {
             id
             ...Profile_viewer
+            ...Issues_viewer
         }
     }
 `
@@ -27,7 +28,7 @@ function App(props) {
             return (
                 <div className="App">
                     <Profile viewer={rQProps.viewer}/>
-                    {renderRoutes(props.route.routes)}
+                    {renderRoutes(props.route.routes, {viewer: rQProps.viewer})}
                 </div>
             )
         }
