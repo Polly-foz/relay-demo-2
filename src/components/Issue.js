@@ -1,13 +1,6 @@
 import React from "react";
 import graphql from 'babel-plugin-relay/macro';
 import {createFragmentContainer} from "react-relay"
-// const fragment = {
-//     issue:graphql`
-//         fragment Issue_issue on Issue{
-//             body
-//         }
-//     `
-// }
 
 function Issue(props){
     const {issue} = props
