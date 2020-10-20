@@ -20,7 +20,6 @@ function Issues(props) {
             })
     }
     const _loadMore = () => {
-        console.log('loadMore')
         if (!relay.hasMore() || relay.isLoading()) {
             return;
         }
@@ -28,7 +27,7 @@ function Issues(props) {
         relay.loadMore(
             1,  // Fetch the next 10 feed items
             error => {
-                console.log(error);
+                error && console.error(error)
             },
         );
     }
@@ -47,32 +46,6 @@ function Issues(props) {
     )
 }
 
-const fragment = {
-    viewer: graphql`
-        fragment Issues_viewer on User @argumentDefinitions(
-            count: {type:"Int",defaultValue:1}
-            after: {type:"String"}
-        ){
-            login
-            issues(
-                first: $count
-                after: $after
-            )@connection(key:"Issues_issues"){
-                pageInfo{
-                    endCursor
-                    hasNextPage
-                }
-                edges{
-                    cursor
-                    node{
-                        id
-                        ...Issue_issue
-                    }
-                }
-            }
-        }
-    `
-}
 
 const query = graphql`
     # Pagination query to be fetched upon calling 'loadMore'.
@@ -115,4 +88,29 @@ const connectionConfig = {
     query: query
 }
 
-export default createPaginationContainer(Issues, fragment, connectionConfig);
+export default createPaginationContainer(Issues, {
+    viewer: graphql`
+        fragment Issues_viewer on User @argumentDefinitions(
+            count: {type:"Int",defaultValue:1}
+            after: {type:"String"}
+        ){
+            login
+            issues(
+                first: $count
+                after: $after
+            )@connection(key:"Issues_issues"){
+                pageInfo{
+                    endCursor
+                    hasNextPage
+                }
+                edges{
+                    cursor
+                    node{
+                        id
+                        ...Issue_issue
+                    }
+                }
+            }
+        }
+    `
+}, connectionConfig);
