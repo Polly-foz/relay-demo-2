@@ -3,20 +3,36 @@ import graphql from 'babel-plugin-relay/macro';
 import {createRefetchContainer} from "react-relay";
 import Repository from "./Repository";
 
-
 function Repositories({relay, viewer}) {
-    const _refetch = () => {
+    const _nextPage = () => {
+
+        const newVars = {
+            first: 1,
+            after: viewer.repositories.pageInfo.endCursor,
+            last: null,
+            before: null,
+        }
+        relay.refetch(
+            newVars,
+            null,
+            () => {
+                // console.log('Refetch done - next page')
+            },
+            {force: true}
+        )
+    }
+
+    const _previousPage = ()=>{
         relay.refetch(
             {
-                count: 2,
-                cursor: viewer.repositories.pageInfo.endCursor,
+                first: null,
+                after: null,
+                last: 1,
+                before: viewer.repositories.pageInfo.startCursor,
             },
-            {
-                count: 2,
-                cursor: viewer.repositories.pageInfo.endCursor,
-            },
+            null,
             () => {
-                console.log('Refetch done')
+                // console.log('Refetch done - prev page')
             },
             {force: true}
         )
@@ -41,7 +57,8 @@ function Repositories({relay, viewer}) {
                 })}
                 </tbody>
             </table>
-            <button onClick={() => _refetch()}>load more</button>
+            <button onClick={() => _previousPage()} disabled={!viewer?.repositories?.pageInfo?.hasPreviousPage}>previous page</button>
+            <button onClick={() => _nextPage()} disabled={!viewer?.repositories?.pageInfo?.hasNextPage}>next page</button>
         </div>
     )
 }
@@ -49,23 +66,27 @@ function Repositories({relay, viewer}) {
 export default createRefetchContainer(Repositories,
     {
         viewer: graphql`
-            fragment Repositories_viewer on User@argumentDefinitions(
-                count: {type:"Int",defaultValue:5}
-                cursor: {type:"String"}
+            fragment Repositories_viewer on User
+            @argumentDefinitions (
+                first: { type: "Int" }
+                after: { type: "String" }
+                last:  { type: "Int" }
+                before: { type: "String" }
             ){
                 login
                 repositories(
-                    first: $count,
-                    after: $cursor
+                    first: $first,
+                    after: $after,
+                    last: $last,
+                    before: $before,
                     orderBy: {field: CREATED_AT, direction: DESC}
-                )@connection(
-                    key: "Repositories_repositories"
                 ){
                     totalCount
                     pageInfo {
                         startCursor
                         endCursor
                         hasNextPage
+                        hasPreviousPage
                     }
                     edges {
                         cursor
@@ -80,13 +101,17 @@ export default createRefetchContainer(Repositories,
     },
     graphql`
         query RepositoriesQuery(
-            $count: Int!
-            $cursor: String
+            $first: Int,
+            $last: Int,
+            $after: String,
+            $before: String
         ){
             viewer{
                 ...Repositories_viewer @arguments(
-                    count: $count
-                    cursor: $cursor
+                    first: $first,
+                    last: $last,
+                    after: $after,
+                    before: $before
                 )
             }
         }
