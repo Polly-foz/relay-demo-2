@@ -12,6 +12,7 @@ const AppNameQuery = graphql`
             id
             ...Profile_viewer
             ...Issues_viewer
+            ...Repositories_viewer
         }
     }
 `
