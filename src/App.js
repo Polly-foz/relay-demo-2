@@ -1,13 +1,14 @@
-import React from 'react';
+import React,{useState} from 'react';
 import './App.css';
 import {renderRoutes} from "react-router-config";
 import {QueryRenderer} from 'react-relay';
 import graphql from 'babel-plugin-relay/macro';
 import RelayEnvironment from './RelayEnvironment';
 import Profile from "./components/Profile";
+import AppNav from "./components/AppNav";
 
 const AppNameQuery = graphql`
-    query AppIdQuery($first: Int, $after: String, $before: String, $last: Int) {
+    query AppIdQuery($first: Int, $after: String, $before: String, $last: Int, $name: String!) {
         viewer {
             id
             ...Profile_viewer
@@ -18,13 +19,16 @@ const AppNameQuery = graphql`
                 after: $after,
                 before: $before
             )
+            ...Repository_viewer@arguments(name: $name)
         }
     }
 `
 
 function App(props) {
+
+    const [repositoryName,setRepositoryName] = useState('')
+
     const renderQuery = ({error, props: rQProps}) => {
-        console.log('TEST');
         if (error) {
             return (
                 <div className="App">
@@ -35,7 +39,8 @@ function App(props) {
             return (
                 <div className="App">
                     <Profile viewer={rQProps.viewer}/>
-                    {renderRoutes(props.route.routes, {viewer: rQProps.viewer})}
+                    <AppNav/>
+                    {renderRoutes(props.route.routes, {viewer: rQProps.viewer, setRepositoryName:(name)=>{setRepositoryName(name)}})}
                 </div>
             )
         }
@@ -48,8 +53,9 @@ function App(props) {
             render={renderQuery}
             route={props.route}
             variables={{
-                first: 1,
-                after: null
+                first: 3,
+                after: null,
+                name: repositoryName
             }}
         />
     );

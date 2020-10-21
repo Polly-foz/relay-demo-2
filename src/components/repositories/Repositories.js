@@ -1,13 +1,13 @@
 import React from "react";
 import graphql from 'babel-plugin-relay/macro';
 import {createRefetchContainer} from "react-relay";
-import Repository from "./Repository";
+import RepositoriesItem from "./RepositoriesItem";
 
 function Repositories({relay, viewer}) {
     const _nextPage = () => {
 
         const newVars = {
-            first: 1,
+            first: 3,
             after: viewer.repositories.pageInfo.endCursor,
             last: null,
             before: null,
@@ -27,7 +27,7 @@ function Repositories({relay, viewer}) {
             {
                 first: null,
                 after: null,
-                last: 1,
+                last: 3,
                 before: viewer.repositories.pageInfo.startCursor,
             },
             null,
@@ -37,6 +37,7 @@ function Repositories({relay, viewer}) {
             {force: true}
         )
     }
+
 
     return (
         <div>
@@ -52,7 +53,7 @@ function Repositories({relay, viewer}) {
                 <tbody>
                 {viewer.repositories.edges.map(edge => {
                     return (
-                        <Repository key={edge.node.id} repository={edge.node}/>
+                        <RepositoriesItem key={edge.node.id} repository={edge.node}/>
                     )
                 })}
                 </tbody>
@@ -92,7 +93,7 @@ export default createRefetchContainer(Repositories,
                         cursor
                         node {
                             id
-                            ...Repository_repository
+                            ...RepositoriesItem_repository
                         }
                     }
                 }

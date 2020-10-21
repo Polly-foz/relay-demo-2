@@ -4,10 +4,10 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {renderRoutes} from "react-router-config";
-import Issues from "./components/Issues";
-import Repositories from "./components/Repositories";
-import Repository from "./components/Repository";
-import RepositoryIssues from "./components/RepositoryIssues";
+import Issues from "./components/issues/Issues";
+import Repositories from "./components/repositories/Repositories";
+import Repository from "./components/repository/Repository";
+import RepositoryIssues from "./components/repository/RepositoryIssues";
 import {BrowserRouter} from "react-router-dom";
 
 const routes = [
@@ -28,11 +28,11 @@ const routes = [
                 component: Repositories,
             },
             {
-                path: "/repository/:id",
+                path: "/repository/:name",
                 component: Repository,
                 routes: [
                     {
-                        path: "/repository/:id/issues",
+                        path: "/repository/:name/issues",
                         component: RepositoryIssues
                     }
                 ]
